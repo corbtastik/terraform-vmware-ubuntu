@@ -1,0 +1,103 @@
+# if running bash
+if [ -n "$BASH_VERSION" ]; then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]; then
+        . "$HOME/.bashrc"
+    fi
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+
+# -----------------------------------------------------------------------------
+# My alias'
+# -----------------------------------------------------------------------------
+alias tree="find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"
+alias ..='cd ..'
+alias ....='cd ../..'
+alias la='ls -la'
+alias lsh='ls -alh'
+alias clr='clear'
+alias rmr='rm -rf $1'
+alias cpr='cp -R $1'
+alias lst="ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/ /' -e 's/-/|/'"
+alias search='find . -name $1'
+alias scripts='ls -l ~/bin'
+alias viewcrs='openssl req -text -noout -verify -in $1'
+alias viewcert='openssl x509 -text -noout -in $1'
+# -----------------------------------------------------------------------------
+# function to Pretty print my $PATH
+# -----------------------------------------------------------------------------
+path() {
+  echo $PATH | tr ":" "\n"
+}
+# -----------------------------------------------------------------------------
+# function to unpack based on file extension
+# -----------------------------------------------------------------------------
+unpack() {
+    if [[ -f $1 ]]; then
+        case $1 in
+          *.tar.bz2) tar xvjf $1;;
+          *.tar.gz) tar xvzf $1;;
+          *.tar.xz) tar xvJf $1;;
+          *.tar.lzma) tar --lzma xvf $1;;
+                      *.jar) jar -xvf $1;;
+          *.bz2) bunzip $1;;
+          *.rar) unrar $1;;
+          *.gz) gunzip $1;;
+          *.tar) tar xvf $1;;
+          *.tbz2) tar xvjf $1;;
+          *.tgz) tar xvzf $1;;
+          *.zip) unzip $1;;
+          *.Z) uncompress $1;;
+          *.7z) 7z x $1;;
+          *.dmg) hdiutul mount $1;; # mount OS X disk images
+          *) echo "'$1' cannot be extracted via >unpack<";;
+    esac
+    else
+        echo "'$1' is not a valid file for unpack"
+    fi
+}
+# -----------------------------------------------------------------------------
+# function to make a new directory, then cd into it
+# -----------------------------------------------------------------------------
+mcd() { mkdir -p "$1" && cd "$1"; }
+# -----------------------------------------------------------------------------
+# function to add,commit and push to git
+# -----------------------------------------------------------------------------
+gush() {
+    if [ -z "$1" ]
+    then
+        echo 'Please enter a comment, for example'
+        echo 'gush "this is a comment"'
+        return
+    fi
+    local ORIGIN="origin"
+    local BRANCH="master"
+
+    if [ -n "$2" ]
+    then
+        ORIGIN = $2
+    fi
+    if [ -n "$3" ]
+    then
+        BRANCH = $3
+    fi
+    git add .
+    git commit -a -m "$1"
+    git push $ORIGIN $BRANCH
+}
+# -----------------------------------------------------------------------------
+# exports
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# PATH
+# -----------------------------------------------------------------------------
+export PATH=~/bin:${PATH}
